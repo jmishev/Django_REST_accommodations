@@ -1,6 +1,5 @@
 # Project Name
-> Web application for making regular revision
->of small shop.
+> Accommodation API
 >
 
 <!---
