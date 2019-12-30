@@ -10,21 +10,24 @@ mydb = mysql.connector.connect(
 
 my_cursor = mydb.cursor()
 
+# formulas for inserting rows in the tables according to the models fields
 sql_formula_hot = "INSERT INTO booking_hotel (name, country, city) VALUES (%s, %s, %s)"
 sql_formula_ap = "INSERT INTO booking_apartment (name, country, city, price)" \
                   " VALUES (%s, %s, %s, %s)"
 sql_formula_rt = "INSERT INTO booking_roomtype(name, price, hotel_id)" \
                   " VALUES (%s, %s, %s)"
+sql_formula_rm = "INSERT INTO booking_room(room_type_id, number)" \
+                  " VALUES (%s, %s)"
 
-
+# list with values for random selection to create the objects
 names = {"hotel": ["Hotel Royal", "Hotel Inter", "Hotel Ambassador"], "apartment": ["Best View", "Worst View"]}
 countries = [("UK", "London"), ("Bulgaria", "Sofia"), ("Italy", "Milan"), ("France", "Paris")]
 prices = [60.00, 80.00, 100.00, 150.00, 200.00, 250, 300]
 room_types = ["single", "double", " triple", "lux", "superior"]
-rooms = [103, 104, 105, 106, 107, 308, 309]
-n = 4
+numbers = [103, 104, 105, 106, 107, 308, 309]
 
-def create_test_properties(n):
+
+def create_test_properties(n):  # creates apartments and hotels
     for i in range(n):
         property_type = random.choice(list(names.keys()))
         name = random.choice(names[property_type])
@@ -54,24 +57,38 @@ create_test_properties(10)
 def create_room_type(n):
     my_cursor.execute("SELECT id FROM booking_hotel")
     my_result = my_cursor.fetchall()
-    unique = {}
-    type = random.choice(room_types)
-    price = random.choice(prices)
-    hotel = (random.choice(my_result))[0]
-    vals = []  # random room prices
+    unique = []  # list to save combinations of hotel & room_type ( must be unique)
     for i in range(n):
-        vals.append((type, price, hotel))
-        if not ((price_type[i][0]), hotel) in unique:
-            my_cursor.execute(sql_formula_rt, val)
+        r_type = random.choice(room_types)
+        price = random.choice(prices)
+        hotel = (random.choice(my_result))[0]
+        vals = (r_type, price, hotel)
+        hot_rm = (r_type, hotel)
+        if hot_rm not in unique:
+            my_cursor.execute(sql_formula_rt, vals)
             mydb.commit()
-            unique.append(((price_type[i][0]), hotel))
+            unique.append(hot_rm)
     my_cursor.execute("SELECT * FROM booking_roomtype")
     my_result = my_cursor.fetchall()
     for i in my_result:
         print(i)
 
-create_room_type(100)
+create_room_type(20)
 
+def create_rooms(n):
+    my_cursor.execute("SELECT id FROM booking_roomtype")
+    my_result = my_cursor.fetchall()
+    unique = {}
+    for i in my_result:
+        room_type = i[0]
+        number = random.choice(numbers)
+        my_cursor.execute(sql_formula_rm, (room_type, number))
+    my_cursor.execute("SELECT * FROM booking_roomtype")
+    my_result = my_cursor.fetchall()
+    for i in my_result:
+        print(i)
+
+create_rooms(60)
 
 def clean_tables():
     my_cursor.execute("DELETE from booking_room")
@@ -84,7 +101,7 @@ def clean_tables():
     for i in my_result:
         print(i)
 
-# clean_tables()
+clean_tables()
 
 
 
