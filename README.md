@@ -19,7 +19,7 @@ for creation of entities and checking availability for certain dates.
 * mysqlclient 1.4.6
 * Django REST 3.10.3
 * Django REST multiple models 2.1.3
-* 
+
 
 <!---
 
