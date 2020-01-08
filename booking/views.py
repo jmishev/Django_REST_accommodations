@@ -18,7 +18,7 @@ class RoomTypeView(viewsets.ModelViewSet):
 class HotelView(viewsets.ModelViewSet):
     serializer_class = HotelSerializer
     queryset = Hotel.objects.all()
-
+    # lookup_field = "name"
 
 class ApartmentView(viewsets.ModelViewSet):
     serializer_class = ApartmentSerializer

@@ -2,15 +2,38 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from decimal import Decimal
 from django.utils import timezone
+from django.db.models.signals import pre_save
+from django.utils.text import slugify
 
 
 class Hotel(models.Model):
     name = models.CharField(max_length=50, )
     country = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
+    slug = models.SlugField(max_length=100, unique=True, default=None)
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Hotel, self).save(*args, **kwargs)
+
+def pre_save_hotel_signal(instance, sender,  *args, **kwargs):
+    num = 1
+    slug = slugify(instance.name)
+    exists = Hotel.objects.filter(slug=slug).exists()
+    if exists:
+        new_slug = slug + "-" + str(num)
+        exists = Hotel.objects.filter(slug=new_slug).exists()
+        while exists:
+            num +=1
+            new_slug = slug + "-" + str(num)
+            exists = Hotel.objects.filter(slug=new_slug).exists()
+        slug = new_slug
+    instance.slug = slug
+
+pre_save.connect(pre_save_hotel_signal, sender=Hotel)
 
 
 class RoomType(models.Model):

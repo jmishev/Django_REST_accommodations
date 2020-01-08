@@ -5,7 +5,7 @@ class RoomSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Room
-        fields = ("number", )
+        fields = ("number",)
 
 
 class RoomTypeSerializer(serializers.ModelSerializer):
@@ -17,12 +17,14 @@ class RoomTypeSerializer(serializers.ModelSerializer):
 
 
 
-class HotelSerializer(serializers.ModelSerializer):
+class HotelSerializer(serializers.HyperlinkedModelSerializer):
     room_types = RoomTypeSerializer(read_only=True, many=True)
+    lookup_field = 'slug'
 
     class Meta:
         model = Hotel
-        fields = ("name", "city", "country", "room_types", )
+        fields = ("name", "city", "country", "room_types", "url")
+        # read_only_fields = ('slug',)
 
 
 class ApartmentSerializer(serializers.ModelSerializer):
